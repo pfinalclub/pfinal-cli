@@ -1,4 +1,8 @@
-./test
-./example
-./idea
-./vendor
+.idea
+.DS_Store
+/vendor
+composer.lock
+/attachment
+/app
+/config
+/storage
