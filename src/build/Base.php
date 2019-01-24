@@ -37,23 +37,23 @@ class Base
     public $binds = [];
     protected static $errorMessage = '';
 
-    protected static $path = [
-        'controller' => 'app/Controllers',
-        'model' => 'app/model',
-    ];
-
     public function bootstrap()
     {
+
         array_shift($_SERVER['argv']);
-        // 获取传递的参数
-        $info = explode(':', array_shift($_SERVER['argv']));
-        //var_dump($info);
-        if (isset($this->binds[$info[0]])) {
-            $class = $this->binds[$info[0]];
+        if (count($_SERVER['argv']) == 0 || $_SERVER['argv'][0] == '-h' || $_SERVER['argv'][0] == '--help') {
+            $class = 'pf\cli\\build\\help\\Command';
+            $action = 'command_list';
         } else {
-            $class = 'pf\cli\\build\\' . strtolower($info[0]) . '\\' . ucfirst($info[0]);
+            $info = explode(':', array_shift($_SERVER['argv']));
+            if (isset($this->binds[$info[0]])) {
+                $class = $this->binds[$info[0]];
+            } else {
+                $class = 'pf\cli\\build\\' . strtolower($info[0]) . '\\' . ucfirst($info[0]);
+            }
+            $action = isset($info[1]) ? $info[1] : 'run';
         }
-        $action = isset($info[1]) ? $info[1] : 'run';
+        //var_dump($class);exit;
         if (class_exists($class)) {
             return call_user_func_array([new $class(), $action], $_SERVER['argv']);
         } else {
@@ -64,7 +64,7 @@ class Base
     final public function error($content)
     {
         if (php_sapi_name() == 'cli') {
-            die(PHP_EOL . "[:- " . $content . "]" . PHP_EOL);
+            die(PHP_EOL . "\033[40m:- " . $content . "\033[0m" . PHP_EOL);
         }
         $this->setError($content);
         return false;

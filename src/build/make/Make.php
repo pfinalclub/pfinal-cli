@@ -36,6 +36,11 @@ use pf\cli\build\Base;
 
 class Make extends Base
 {
+    public static $path = [
+        'controller' => 'app/Controllers',
+        'model' => 'app/model',
+    ];
+
     public function controller($arg, $type = 'controller')
     {
         $info = @explode('/', $arg);
