@@ -36,14 +36,21 @@ class Base
 {
     public $binds = [];
     protected static $errorMessage = '';
+    protected static $sys_consone = [
+        'h' => ['Command', 'help', '--help this is help'],
+        'v' => ['Command', 'version', '--version  this is version'],
+    ];
 
     public function bootstrap()
     {
 
         array_shift($_SERVER['argv']);
-        if (count($_SERVER['argv']) == 0 || $_SERVER['argv'][0] == '-h' || $_SERVER['argv'][0] == '--help') {
-            $class = 'pf\cli\\build\\help\\Command';
-            $action = 'command_list';
+        if (count($_SERVER['argv']) == 0 || strstr($_SERVER['argv'][0], '-')) {
+            if (count($this->_get_class_action($_SERVER['argv']))) {
+                list($class, $action) = $this->_get_class_action($_SERVER['argv']);
+            } else {
+                return $this->error('Params does not exist');
+            }
         } else {
             $info = explode(':', array_shift($_SERVER['argv']));
             if (isset($this->binds[$info[0]])) {
@@ -53,7 +60,7 @@ class Base
             }
             $action = isset($info[1]) ? $info[1] : 'run';
         }
-        //var_dump($class);exit;
+
         if (class_exists($class)) {
             return call_user_func_array([new $class(), $action], $_SERVER['argv']);
         } else {
@@ -64,7 +71,7 @@ class Base
     final public function error($content)
     {
         if (php_sapi_name() == 'cli') {
-            die(PHP_EOL . "\033[40m:- " . $content . "\033[0m" . PHP_EOL);
+            die(PHP_EOL . sprintf("\033[31m %s \033[0m \n", $content) . PHP_EOL);
         }
         $this->setError($content);
         return false;
@@ -78,7 +85,7 @@ class Base
     final public function success($content)
     {
         if (php_sapi_name() == 'cli') {
-            die(PHP_EOL . "[:- " . $content . "]" . PHP_EOL);
+            die(PHP_EOL . sprintf("\033[32m %s \033[0m \n",  $content ) . PHP_EOL);
         }
         return true;
     }
@@ -86,5 +93,30 @@ class Base
     public function getError()
     {
         return self::$errorMessage;
+    }
+
+    private function _get_class_action($params)
+    {
+        $options = [];
+        if (count($params) > 0) {
+            switch (trim($params[0], '-')) {
+                case 'h':
+                case 'help':
+                    $options = ['pf\cli\\build\\help\\' . ucfirst(self::$sys_consone['h'][0]), self::$sys_consone['h'][1]];
+                    break;
+                case 'v':
+                case 'V':
+                case 'version':
+                    $options = ['pf\cli\\build\\help\\' . ucfirst(self::$sys_consone['v'][0]), self::$sys_consone['v'][1]];
+                    break;
+                default:
+
+                    break;
+            }
+        } else {
+            $options = ['pf\cli\\build\\help\\' . ucfirst(self::$sys_consone['h'][0]), self::$sys_consone['h'][1]];
+        }
+
+        return $options;
     }
 }

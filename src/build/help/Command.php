@@ -33,25 +33,16 @@ namespace pf\cli\build\help;
 
 use pf\cli\build\Base;
 use pf\cli\build\make\Make;
+use PHPUnit\Runner\Version;
 
 class Command extends Base
 {
-    public function command_list()
+    protected function command_list()
     {
-        $command_list = $this->get_command_dir();
+
         $command_list_str = '';
-        if (count($command_list) > 0) {
-            foreach ($command_list as $item) {
-                $command_list_str .= sprintf("\033[35m %s \033[0m \n",$item);
-                $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
-                $command_self_list = $command_self::$path;
-                if (count($command_self_list) > 0) {
-                    foreach ($command_self_list as $k => $v) {
-                        $command_list_str .= sprintf("\033[32m   %s \033[0m \n", $item . ':' . $k);
-                    }
-                }
-            }
-        }
+        $command_list_str .= $this->_get_params($command_list_str);
+        $command_list_str .= $this->_get_command($command_list_str);
         die($command_list_str);
     }
 
@@ -68,5 +59,48 @@ class Command extends Base
             $command_list[] = $file;
         }
         return $command_list;
+    }
+
+    public function help()
+    {
+        $this->command_list();
+    }
+
+    public function version()
+    {
+        echo sprintf("\033[32m   Version 0.0.1\n   Time:2019-1-24 11:23 ToCommit \n   Author:pfianl <lampxxiezi@163.com>  \033[0m \n");
+    }
+
+    protected function _get_command()
+    {
+        $command_list_str = '';
+        $command_list = $this->get_command_dir();
+        if (count($command_list) > 0) {
+            foreach ($command_list as $item) {
+                $command_list_str = sprintf("\033[35m %s \033[0m \n", $item);
+                $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
+                if (class_exists($command_self)) {
+                    $command_self_list = $command_self::$path;
+                    if (count($command_self_list) > 0) {
+                        foreach ($command_self_list as $k => $v) {
+                            $command_list_str .= sprintf("\033[32m   %s \033[0m \n", $item . ':' . $k);
+                        }
+                    }
+                }
+            }
+        }
+        return $command_list_str;
+    }
+
+    protected function _get_params()
+    {
+        $options = self::$sys_consone;
+        $command_list_str = sprintf("\033[35m %s \033[0m \n", 'Options:');
+        if (count($options) > 0) {
+            foreach ($options as $k => $option) {
+                $command_list_str .= sprintf("\033[32m   -%s \033[0m ", $k) . sprintf("\033[37m   %s \033[0m \n", $option[2]);
+            }
+        }
+        return $command_list_str;
     }
 }

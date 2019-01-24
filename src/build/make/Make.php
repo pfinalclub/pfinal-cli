@@ -38,7 +38,14 @@ class Make extends Base
 {
     public static $path = [
         'controller' => 'app/Controllers',
+        'middleware' => 'app/middleware',
+        'migration' => 'app/migration',
         'model' => 'app/model',
+        'request' => 'app/request',
+        'seed' => 'app/seed',
+        'service' => 'app/service',
+        'tag' => 'app/tag',
+        'test' => 'tests',
     ];
 
     public function controller($arg, $type = 'controller')
@@ -52,7 +59,8 @@ class Make extends Base
         } else {
             $file .= '/' . ucfirst($MODULE) . '.php';
         }
-        if (!empty(dirname($file))) {
+        $dir = dirname($file);
+        if (!empty($dir)) {
             if (!(is_dir(dirname($file)) or mkdir(dirname($file), 0755, true))) return $this->error("Directory to create failure");
         }
         //var_dump($file);
@@ -63,6 +71,20 @@ class Make extends Base
         } else {
             $data = str_replace(['{{APP}}', '{{MODULE}}', '{{CONTROLLER}}'], ['App', '', ucfirst($MODULE)], $data);
         }
-        return file_put_contents($file, $data);
+        if (file_put_contents($file, $data)) {
+            $this->success('Command Success');
+        }
+    }
+
+    public function run()
+    {
+        $command_list_str = sprintf("\033[35m %s \033[0m \n", 'make');
+        $command_self_list = self::$path;
+        if (count($command_self_list) > 0) {
+            foreach ($command_self_list as $k => $v) {
+                $command_list_str .= sprintf("\033[32m   %s \033[0m \n", 'make' . ':' . $k);
+            }
+        }
+        die($command_list_str);
     }
 }
