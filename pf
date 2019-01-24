@@ -1,0 +1,4 @@
+<?php
+use pf\cli\PFCli;
+require 'vendor/autoload.php';
+PFCli::bootstrap();

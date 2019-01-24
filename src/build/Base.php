@@ -35,9 +35,15 @@ namespace pf\cli\build;
 class Base
 {
     public $binds = [];
+    protected static $errorMessage = '';
+
+    protected static $path = [
+        'controller' => 'app/Controllers',
+        'model' => 'app/model',
+    ];
+
     public function bootstrap()
     {
-
         array_shift($_SERVER['argv']);
         // 获取传递的参数
         $info = explode(':', array_shift($_SERVER['argv']));
@@ -45,8 +51,40 @@ class Base
         if (isset($this->binds[$info[0]])) {
             $class = $this->binds[$info[0]];
         } else {
-            $class = 'pf\cli\\build\\'.strtolower($info[0]).'\\' .ucfirst($info[0]);
+            $class = 'pf\cli\\build\\' . strtolower($info[0]) . '\\' . ucfirst($info[0]);
         }
-        var_dump($class);
+        $action = isset($info[1]) ? $info[1] : 'run';
+        if (class_exists($class)) {
+            return call_user_func_array([new $class(), $action], $_SERVER['argv']);
+        } else {
+            return $this->error('Command does not exist');
+        }
+    }
+
+    final public function error($content)
+    {
+        if (php_sapi_name() == 'cli') {
+            die(PHP_EOL . "[:- " . $content . "]" . PHP_EOL);
+        }
+        $this->setError($content);
+        return false;
+    }
+
+    public function setError($content)
+    {
+        self::$errorMessage = $content;
+    }
+
+    final public function success($content)
+    {
+        if (php_sapi_name() == 'cli') {
+            die(PHP_EOL . "[:- " . $content . "]" . PHP_EOL);
+        }
+        return true;
+    }
+
+    public function getError()
+    {
+        return self::$errorMessage;
     }
 }
