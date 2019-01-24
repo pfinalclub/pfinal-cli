@@ -1,3 +1,4 @@
+#!/bin/env php
 <?php
 use pf\cli\PFCli;
 require 'vendor/autoload.php';

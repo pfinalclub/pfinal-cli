@@ -39,17 +39,20 @@ class Command extends Base
     public function command_list()
     {
         $command_list = $this->get_command_dir();
-        $command_list_str = '\033[31mheool world \033[0m';
-        //var_dump($command_list);
-//        if (count($command_list) > 0) {
-//            foreach ($command_list as $item) {
-//                $command_list_str .= '\033[31' . $item . '\033[0m';
-//                $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
-//                $command_self_list = $command_self::$path;
-//
-//            }
-//        }
-        echo $command_list_str;
+        $command_list_str = '';
+        if (count($command_list) > 0) {
+            foreach ($command_list as $item) {
+                $command_list_str .= sprintf("\033[35m %s \033[0m \n",$item);
+                $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
+                $command_self_list = $command_self::$path;
+                if (count($command_self_list) > 0) {
+                    foreach ($command_self_list as $k => $v) {
+                        $command_list_str .= sprintf("\033[32m   %s \033[0m \n", $item . ':' . $k);
+                    }
+                }
+            }
+        }
+        die($command_list_str);
     }
 
     protected function get_command_dir()
