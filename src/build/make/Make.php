@@ -33,6 +33,7 @@
 namespace pf\cli\build\make;
 
 use pf\cli\build\Base;
+use pf\cli\output\Color;
 
 class Make extends Base
 {
@@ -78,13 +79,13 @@ class Make extends Base
 
     public function run()
     {
-        $command_list_str = sprintf("\033[35m %s \033[0m \n", 'make');
+        $command_list_str = $this->_output_for_sys('make');
         $command_self_list = self::$path;
         if (count($command_self_list) > 0) {
             foreach ($command_self_list as $k => $v) {
-                $command_list_str .= sprintf("\033[32m   %s \033[0m \n", 'make' . ':' . $k);
+                $command_list_str .= $this->_output_for_sys('   make' . ':' . $k);
             }
         }
-        die($command_list_str);
+        fwrite(STDOUT, $command_list_str);
     }
 }

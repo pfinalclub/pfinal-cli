@@ -33,6 +33,7 @@ namespace pf\cli\build\help;
 
 use pf\cli\build\Base;
 use pf\cli\build\make\Make;
+use pf\cli\output\Color;
 use PHPUnit\Runner\Version;
 
 class Command extends Base
@@ -63,12 +64,12 @@ class Command extends Base
 
     public function help()
     {
-        $this->command_list();
+        fwrite(STDOUT, $this->command_list());
     }
 
     public function version()
     {
-        echo sprintf("\033[32m   Version 0.0.1\n   Time:2019-1-24 11:23 ToCommit \n   Author:pfianl <lampxxiezi@163.com>  \033[0m \n");
+        fwrite(STDOUT, $this->_output_for_sys("   Version 0.0.1\n   Time:2019-1-24 11:23 ToCommit \n   Author:pfianl <lampxxiezi@163.com>"));
     }
 
     protected function _get_command()
@@ -77,13 +78,13 @@ class Command extends Base
         $command_list = $this->get_command_dir();
         if (count($command_list) > 0) {
             foreach ($command_list as $item) {
-                $command_list_str = sprintf("\033[35m %s \033[0m \n", $item);
+                $command_list_str = $this->_output_for_sys($item);
                 $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
                 if (class_exists($command_self)) {
                     $command_self_list = $command_self::$path;
                     if (count($command_self_list) > 0) {
                         foreach ($command_self_list as $k => $v) {
-                            $command_list_str .= sprintf("\033[32m   %s \033[0m \n", $item . ':' . $k);
+                            $command_list_str .= $this->_output_for_sys('   ' . $item . ':' . $k);
                         }
                     }
                 }
@@ -95,10 +96,10 @@ class Command extends Base
     protected function _get_params()
     {
         $options = self::$sys_consone;
-        $command_list_str = sprintf("\033[35m %s \033[0m \n", 'Options:');
+        $command_list_str = $this->_output_for_sys('Options:');
         if (count($options) > 0) {
             foreach ($options as $k => $option) {
-                $command_list_str .= sprintf("\033[32m   -%s \033[0m ", $k) . sprintf("\033[37m   %s \033[0m \n", $option[2]);
+                $command_list_str .= $this->_output_for_sys('    -' . $k . '    ' . $option[2]);
             }
         }
         return $command_list_str;

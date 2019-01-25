@@ -32,6 +32,9 @@
 
 namespace pf\cli\build;
 
+
+use pf\cli\output\Color;
+
 class Base
 {
     public $binds = [];
@@ -70,8 +73,15 @@ class Base
 
     final public function error($content)
     {
+        $color = new Color();
+        //var_dump(PHP_OS);exit;
         if (php_sapi_name() == 'cli') {
-            die(PHP_EOL . sprintf("\033[31m %s \033[0m \n", $content) . PHP_EOL);
+            if (PHP_OS == "WINNT") {
+                die(PHP_EOL . $content . "\n" . PHP_EOL);
+            } else {
+                die($color->getColoredString($content, 'red', 'black'));
+            }
+
         }
         $this->setError($content);
         return false;
@@ -84,8 +94,13 @@ class Base
 
     final public function success($content)
     {
+        $color = new Color();
         if (php_sapi_name() == 'cli') {
-            die(PHP_EOL . sprintf("\033[32m %s \033[0m \n",  $content ) . PHP_EOL);
+            if (PHP_OS == "WINNT") {
+                die(PHP_EOL . $content . "\n" . PHP_EOL);
+            } else {
+                die($color->getColoredString($content, 'green', 'black'));
+            }
         }
         return true;
     }
@@ -118,5 +133,15 @@ class Base
         }
 
         return $options;
+    }
+
+    protected function _output_for_sys($content, $color = "green")
+    {
+        if (PHP_OS == "WINNT") {
+            return $content . "\n" . PHP_EOL;
+        } else {
+            $colors = new Color();
+            return $colors->initColoredString($content, $color) . PHP_EOL;
+        }
     }
 }
