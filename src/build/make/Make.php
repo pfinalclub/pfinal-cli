@@ -76,6 +76,30 @@ class Make extends Base
         }
     }
 
+    public function model($arg = [])
+    {
+        $dir = self::$path['model'];
+        if (!(is_dir($dir) or mkdir($dir, 0755, true))) return $this->error("Directory to create failure");
+        if (!$arg) {
+            fwrite(STDOUT, $this->_output_for_sys("\n This method takes parameters The following parameters:\n php pf make:model  Test", "red"));
+            die();
+        }
+        $namespace = str_replace('/', '\\', self::$path['model']);
+        $info = explode('.', $arg);
+        $MODEL = ucfirst($info[0]);
+        $TABLE = strtolower($info[0]);
+        $file = self::$path['model'] . '/' . ucfirst($MODEL) . '.php';
+        if (is_file($file)) {
+            return $this->error("Model file already exists");
+        }
+        $data = file_get_contents(__DIR__ . '/tpl/model.tpl');
+        $data = str_replace(['{{NAMESPACE}}', '{{MODEL}}', '{{TABLE}}'],
+            [$namespace, $MODEL, $TABLE], $data);
+        if (file_put_contents($file, $data)) {
+            $this->success('Command Success');
+        }
+    }
+
     public function run()
     {
         $command_list_str = $this->_output_for_sys('make');
