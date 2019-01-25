@@ -69,7 +69,7 @@ class Command extends Base
 
     public function version()
     {
-        fwrite(STDOUT, $this->_output_for_sys("   Version 0.0.1\n   Time:2019-1-24 11:23 ToCommit \n   Author:pfianl <lampxxiezi@163.com>"));
+        fwrite(STDOUT, $this->_output_for_sys("   Version 0.0.1\n   Time:2019-1-24 11:23 ToCommit \n   Author:pfianl <lampxxiezi@163.com>", "purple"));
     }
 
     protected function _get_command()
@@ -78,7 +78,7 @@ class Command extends Base
         $command_list = $this->get_command_dir();
         if (count($command_list) > 0) {
             foreach ($command_list as $item) {
-                $command_list_str = $this->_output_for_sys($item);
+                $command_list_str = $this->_output_for_sys($item,"purple");
                 $command_self = '\pf\\cli\\build\\' . $item . '\\' . ucfirst($item);
                 if (class_exists($command_self)) {
                     $command_self_list = $command_self::$path;
@@ -96,7 +96,7 @@ class Command extends Base
     protected function _get_params()
     {
         $options = self::$sys_consone;
-        $command_list_str = $this->_output_for_sys('Options:');
+        $command_list_str = $this->_output_for_sys('Options:',"purple");
         if (count($options) > 0) {
             foreach ($options as $k => $option) {
                 $command_list_str .= $this->_output_for_sys('    -' . $k . '    ' . $option[2]);

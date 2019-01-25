@@ -102,7 +102,7 @@ class Make extends Base
 
     public function run()
     {
-        $command_list_str = $this->_output_for_sys('make');
+        $command_list_str = $this->_output_for_sys('make',"purple");
         $command_self_list = self::$path;
         if (count($command_self_list) > 0) {
             foreach ($command_self_list as $k => $v) {
