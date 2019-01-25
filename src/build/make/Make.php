@@ -33,7 +33,6 @@
 namespace pf\cli\build\make;
 
 use pf\cli\build\Base;
-use pf\cli\output\Color;
 
 class Make extends Base
 {
@@ -64,7 +63,7 @@ class Make extends Base
         if (!empty($dir)) {
             if (!(is_dir(dirname($file)) or mkdir(dirname($file), 0755, true))) return $this->error("Directory to create failure");
         }
-        //var_dump($file);
+
         if (is_file($file)) return $this->error('Controller file already exists');
         $data = file_get_contents(__DIR__ . '/tpl/' . strtolower($type) . '.tpl');
         if (isset($info[1])) {
