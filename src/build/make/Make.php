@@ -39,15 +39,21 @@ class Make extends Base
     public static $path = [
         'controller' => 'app/Controllers',
         'middleware' => 'app/middleware',
-        'migration' => 'app/migration',
+//        'migration' => 'app/migration',
         'model' => 'app/model',
-        'request' => 'app/request',
-        'seed' => 'app/seed',
-        'service' => 'app/service',
+//        'request' => 'app/request',
+//        'seed' => 'app/seed',
+//        'service' => 'app/service',
         'tag' => 'app/tag',
         'test' => 'tests',
     ];
 
+    /**
+     * 创建控制器
+     * @param $arg
+     * @param string $type
+     * @return bool
+     */
     public function controller($arg, $type = 'controller')
     {
         $info = @explode('/', $arg);
@@ -76,6 +82,11 @@ class Make extends Base
         }
     }
 
+    /**
+     * 创建model
+     * @param array $arg
+     * @return bool
+     */
     public function model($arg = [])
     {
         $dir = self::$path['model'];
@@ -112,6 +123,11 @@ class Make extends Base
         fwrite(STDOUT, $command_list_str);
     }
 
+    /**
+     * 创建中间件
+     * @param array $arg
+     * @return bool
+     */
     public function middleware($arg = [])
     {
         $dir = self::$path['middleware'];
@@ -127,6 +143,28 @@ class Make extends Base
         $namespace = str_replace('/', '\\', self::$path['middleware']);
         $data = file_get_contents(__DIR__ . '/tpl/middleware.tpl');
         $data = str_replace(['{{NAMESPACE}}', '{{NAME}}'], [$namespace, ucfirst($arg)], $data);
+        file_put_contents($file, $data);
+    }
+
+    /**
+     * 创建标签
+     * @param $name
+     * @return bool
+     */
+    public function tag($name)
+    {
+        $dir = self::$path['tag'];
+        if (!(is_dir($dir) or mkdir($dir, 0755, true))) return $this->error("Directory to create failure");
+        if (!$name) {
+            fwrite(STDOUT, $this->_output_for_sys("\n This method takes parameters The following parameters:\n php pf make:tag  TestTag", "red"));
+            die();
+        }
+        $file = self::$path['tag'] . '/' . ucfirst($name) . '.php';
+        if (is_file($file)) {
+            return $this->error('File already exists');
+        }
+        $data = file_get_contents(__DIR__ . '/tpl/tag.tpl');
+        $data = str_replace(['{{NAME}}'], [ucfirst($name)], $data);
         file_put_contents($file, $data);
     }
 }
